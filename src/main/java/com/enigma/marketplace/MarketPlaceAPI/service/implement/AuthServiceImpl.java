@@ -2,12 +2,11 @@ package com.enigma.marketplace.MarketPlaceAPI.service.implement;
 
 import com.enigma.marketplace.MarketPlaceAPI.constant.UserRole;
 import com.enigma.marketplace.MarketPlaceAPI.dto.request.AuthRequest;
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.RegisterMerchantRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.request.RegisterRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.LoginResponse;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.RegisterResponse;
-import com.enigma.marketplace.MarketPlaceAPI.entity.Customer;
-import com.enigma.marketplace.MarketPlaceAPI.entity.Role;
-import com.enigma.marketplace.MarketPlaceAPI.entity.UserAccount;
+import com.enigma.marketplace.MarketPlaceAPI.entity.*;
 import com.enigma.marketplace.MarketPlaceAPI.repository.UserAccountRepository;
 import com.enigma.marketplace.MarketPlaceAPI.service.*;
 import com.enigma.marketplace.MarketPlaceAPI.util.ValidationUtil;
@@ -86,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public RegisterResponse registerMerchant(RegisterRequest request) throws DataIntegrityViolationException {
+    public RegisterResponse registerMerchant(RegisterMerchantRequest request) throws DataIntegrityViolationException {
         validationUtil.validate(request);
         Role role=roleService.getOrSave(UserRole.ROLE_MERCHANT);
         String hashPassword = passwordEncoder.encode(request.getPassword());
@@ -96,9 +95,13 @@ public class AuthServiceImpl implements AuthService {
                 .roles(List.of(role))
                 .isEnable(true).build();
         userAccountRepository.saveAndFlush(account);
-        Admin admin = Admin.builder().name(request.getName())
-                .phone(request.getPhone()).userAccount(account).build();
-        merchantService.addAdmin(admin);
+        Merchant merchant = Merchant.builder().name(request.getName())
+                .userAccount(account).build();
+        List<Product> products = request.getProducts().stream().map(product ->
+                Product.builder().name(product.getName()).price(product.getPrice())
+                        .merchant(merchant).build()).toList();
+        merchant.setProducts(products);
+        merchantService.addMerchant(merchant);
         List<String> roleAuth = account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         return RegisterResponse.builder()
                 .username(account.getUsername())

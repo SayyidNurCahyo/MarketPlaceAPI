@@ -1,15 +1,14 @@
 package com.enigma.marketplace.MarketPlaceAPI.controller;
 
+import com.enigma.marketplace.MarketPlaceAPI.constant.APIUrl;
+import com.enigma.marketplace.MarketPlaceAPI.constant.ResponseMessage;
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.SearchRequest;
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.UpdateCustomerRequest;
+import com.enigma.marketplace.MarketPlaceAPI.dto.response.CommonResponse;
+import com.enigma.marketplace.MarketPlaceAPI.dto.response.CustomerResponse;
+import com.enigma.marketplace.MarketPlaceAPI.dto.response.PagingResponse;
+import com.enigma.marketplace.MarketPlaceAPI.security.AuthenticatedUser;
 import com.enigma.marketplace.MarketPlaceAPI.service.CustomerService;
-import com.enigma.wmbapi.constant.APIUrl;
-import com.enigma.wmbapi.constant.ResponseMessage;
-import com.enigma.wmbapi.dto.request.SearchCustomerRequest;
-import com.enigma.wmbapi.dto.request.UpdateCustomerRequest;
-import com.enigma.wmbapi.dto.response.CommonResponse;
-import com.enigma.wmbapi.dto.response.CustomerResponse;
-import com.enigma.wmbapi.dto.response.PagingResponse;
-import com.enigma.wmbapi.security.AuthenticatedUser;
-import com.enigma.wmbapi.service.CustomerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,13 +22,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = APIUrl.CUSTOMER_API)
+@RequestMapping(path = APIUrl.CUSTOMER)
 public class CustomerController {
     private final CustomerService customerService;
     private final AuthenticatedUser authenticatedUser;
 
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN') or @authenticatedUser.hasId(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @authenticatedUser.hasCustomerId(#id)")
     @GetMapping(path = "/{id}")
     public ResponseEntity<CommonResponse<CustomerResponse>> getCustomerById(@PathVariable String id) {
         CustomerResponse customer = customerService.getCustomerById(id);
@@ -41,19 +40,18 @@ public class CustomerController {
     }
 
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<CommonResponse<List<CustomerResponse>>> getAllCustomer(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "5") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "phone", required = false) String phone
+            @RequestParam(name = "name", required = false) String name
     ) {
-        SearchCustomerRequest request = SearchCustomerRequest.builder()
+        SearchRequest request = SearchRequest.builder()
                 .page(page).size(size).sortBy(sortBy).direction(direction)
-                .name(name).phone(phone).build();
+                .name(name).build();
         Page<CustomerResponse> customers = customerService.getAllCustomer(request);
         PagingResponse pagingResponse = PagingResponse.builder()
                 .totalPages(customers.getTotalPages())
@@ -71,26 +69,26 @@ public class CustomerController {
     }
 
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN') or @authenticatedUser.hasId(#request.id)")
+    @PreAuthorize("hasRole('ADMIN') or @authenticatedUser.hasCustomerId(#request.id)")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<CustomerResponse>> updateCustomer(@RequestBody UpdateCustomerRequest request) {
         CustomerResponse customer = customerService.updateCustomer(request);
         CommonResponse<CustomerResponse> response = CommonResponse.<CustomerResponse>builder()
-                .statusCode(HttpStatus.ACCEPTED.value())
+                .statusCode(HttpStatus.OK.value())
                 .message(ResponseMessage.SUCCESS_UPDATE_DATA)
                 .data(customer).build();
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN') or @authenticatedUser.hasId(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @authenticatedUser.hasCustomerId(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<CommonResponse<CustomerResponse>> disableCustomerById(@PathVariable String id) {
-        CustomerResponse customer = customerService.disableById(id);
+        customerService.disableById(id);
         CommonResponse<CustomerResponse> response = CommonResponse.<CustomerResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message(ResponseMessage.SUCCESS_DELETE_DATA)
-                .data(customer).build();
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

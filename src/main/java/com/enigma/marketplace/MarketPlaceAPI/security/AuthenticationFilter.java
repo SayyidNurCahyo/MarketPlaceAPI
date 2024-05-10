@@ -1,5 +1,9 @@
 package com.enigma.marketplace.MarketPlaceAPI.security;
 
+import com.enigma.marketplace.MarketPlaceAPI.dto.response.JwtClaims;
+import com.enigma.marketplace.MarketPlaceAPI.entity.UserAccount;
+import com.enigma.marketplace.MarketPlaceAPI.service.JwtService;
+import com.enigma.marketplace.MarketPlaceAPI.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

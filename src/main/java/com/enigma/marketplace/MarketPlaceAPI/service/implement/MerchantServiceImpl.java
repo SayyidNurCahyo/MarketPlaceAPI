@@ -69,6 +69,8 @@ public class MerchantServiceImpl implements MerchantService {
         return MerchantResponse.builder()
                 .id(merchant.getId())
                 .name(merchant.getName())
+                .phone(merchant.getPhone())
+                .address(merchant.getAddress())
                 .products(productResponses)
                 .username(merchant.getUserAccount().getUsername())
                 .build();

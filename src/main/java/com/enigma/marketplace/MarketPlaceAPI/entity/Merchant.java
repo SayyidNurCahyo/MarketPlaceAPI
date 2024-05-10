@@ -20,6 +20,10 @@ public class Merchant {
     private String id;
     @Column(name = "name")
     private String name;
+    @Column(name = "phone")
+    private String phone;
+    @Column(name = "address")
+    private String address;
     @OneToMany(mappedBy = "merchant", cascade = CascadeType.PERSIST)
     @JsonManagedReference
     private List<Product> products;

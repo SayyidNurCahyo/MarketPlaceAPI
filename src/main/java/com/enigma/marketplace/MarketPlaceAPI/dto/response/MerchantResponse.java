@@ -12,6 +12,8 @@ import java.util.List;
 public class MerchantResponse {
     private String id;
     private String name;
+    private String phone;
+    private String address;
     private List<ProductResponse> products;
     private String username;
 }

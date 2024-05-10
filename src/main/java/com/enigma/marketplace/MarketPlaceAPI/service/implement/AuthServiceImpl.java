@@ -96,6 +96,7 @@ public class AuthServiceImpl implements AuthService {
                 .isEnable(true).build();
         userAccountRepository.saveAndFlush(account);
         Merchant merchant = Merchant.builder().name(request.getName())
+                .phone(request.getPhone()).address(request.getAddress())
                 .userAccount(account).build();
         List<Product> products = request.getProducts().stream().map(product ->
                 Product.builder().name(product.getName()).price(product.getPrice())

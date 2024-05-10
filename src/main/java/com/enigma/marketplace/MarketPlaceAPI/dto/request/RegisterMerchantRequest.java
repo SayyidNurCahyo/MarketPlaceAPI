@@ -17,6 +17,10 @@ public class RegisterMerchantRequest {
     private String name;
     @NotNull(message = "Merchant Product is Required")
     private List<NewProductRequest> products;
+    @NotBlank(message = "Phone Number is Required")
+    private String phone;
+    @NotBlank(message = "Address is Required")
+    private String address;
     @NotBlank(message = "Username is Required")
     @Min(value = 8, message = "Username at Least 8 Character")
     private String username;

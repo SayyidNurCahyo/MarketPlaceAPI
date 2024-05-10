@@ -70,6 +70,7 @@ public class MerchantServiceImpl implements MerchantService {
                 .id(merchant.getId())
                 .name(merchant.getName())
                 .products(productResponses)
+                .username(merchant.getUserAccount().getUsername())
                 .build();
     }
 

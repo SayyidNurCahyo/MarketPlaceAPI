@@ -1,6 +1,19 @@
 package com.enigma.marketplace.MarketPlaceAPI.service.implement;
 
+import com.enigma.marketplace.MarketPlaceAPI.constant.UserRole;
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.AuthRequest;
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.RegisterRequest;
+import com.enigma.marketplace.MarketPlaceAPI.dto.response.LoginResponse;
+import com.enigma.marketplace.MarketPlaceAPI.dto.response.RegisterResponse;
+import com.enigma.marketplace.MarketPlaceAPI.entity.Customer;
+import com.enigma.marketplace.MarketPlaceAPI.entity.Role;
+import com.enigma.marketplace.MarketPlaceAPI.entity.UserAccount;
 import com.enigma.marketplace.MarketPlaceAPI.repository.UserAccountRepository;
+import com.enigma.marketplace.MarketPlaceAPI.service.AuthService;
+import com.enigma.marketplace.MarketPlaceAPI.service.CustomerService;
+import com.enigma.marketplace.MarketPlaceAPI.service.JwtService;
+import com.enigma.marketplace.MarketPlaceAPI.service.RoleService;
+import com.enigma.marketplace.MarketPlaceAPI.util.ValidationUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,17 +49,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(rollbackFor = Exception.class)
     @PostConstruct
-    public void initSuperAdmin() {
+    public void initAdmin() {
         Optional<UserAccount> currentUser = userAccountRepository.findByUsername(superAdminUsername);
         if (currentUser.isPresent()) return;
-        Role superAdmin = roleService.getOrSave(UserRole.ROLE_SUPER_ADMIN);
+        Role superAdmin = roleService.getOrSave(UserRole.ROLE_ADMIN);
         Role admin = roleService.getOrSave(UserRole.ROLE_ADMIN);
         Role customer = roleService.getOrSave(UserRole.ROLE_CUSTOMER);
         UserAccount account = UserAccount.builder()
                 .username(superAdminUsername)
                 .password(passwordEncoder.encode(superAdminPassword))
                 .roles(List.of(superAdmin, admin, customer))
-                .isEnabled(true)
+                .isEnable(true)
                 .build();
         userAccountRepository.save(account);
     }
@@ -61,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(request.getUsername())
                 .password(hashPassword)
                 .roles(List.of(role))
-                .isEnabled(true).build();
+                .isEnable(true).build();
         userAccountRepository.saveAndFlush(account);
         Customer customer = Customer.builder()
                 .name(request.getName())
@@ -76,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public RegisterResponse registerAdmin(RegisterRequest request) throws DataIntegrityViolationException {
+    public RegisterResponse registerMerchant(RegisterRequest request) throws DataIntegrityViolationException {
         validationUtil.validate(request);
         Role role=roleService.getOrSave(UserRole.ROLE_ADMIN);
         String hashPassword = passwordEncoder.encode(request.getPassword());
@@ -84,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(request.getUsername())
                 .password(hashPassword)
                 .roles(List.of(role))
-                .isEnabled(true).build();
+                .isEnable(true).build();
         userAccountRepository.saveAndFlush(account);
         Admin admin = Admin.builder().name(request.getName())
                 .phone(request.getPhone()).userAccount(account).build();

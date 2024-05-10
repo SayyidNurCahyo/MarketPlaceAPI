@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SearchCustomerRequest {
+public class SearchRequest {
     private Integer size;
     private Integer page;
     private String sortBy;

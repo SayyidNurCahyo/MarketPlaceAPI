@@ -9,10 +9,7 @@ import com.enigma.marketplace.MarketPlaceAPI.entity.Customer;
 import com.enigma.marketplace.MarketPlaceAPI.entity.Role;
 import com.enigma.marketplace.MarketPlaceAPI.entity.UserAccount;
 import com.enigma.marketplace.MarketPlaceAPI.repository.UserAccountRepository;
-import com.enigma.marketplace.MarketPlaceAPI.service.AuthService;
-import com.enigma.marketplace.MarketPlaceAPI.service.CustomerService;
-import com.enigma.marketplace.MarketPlaceAPI.service.JwtService;
-import com.enigma.marketplace.MarketPlaceAPI.service.RoleService;
+import com.enigma.marketplace.MarketPlaceAPI.service.*;
 import com.enigma.marketplace.MarketPlaceAPI.util.ValidationUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +37,11 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final ValidationUtil validationUtil;
     private final AuthenticationManager authenticationManager;
-    private final AdminService adminService;
+    private final MerchantService merchantService;
 
-    @Value("${wmbapi.username.superadmin}")
+    @Value("${marketplace.username.superadmin}")
     private String superAdminUsername;
-    @Value("${wmbapi.password.superadmin}")
+    @Value("${marketplace.password.superadmin}")
     private String superAdminPassword;
 
     @Transactional(rollbackFor = Exception.class)
@@ -52,13 +49,13 @@ public class AuthServiceImpl implements AuthService {
     public void initAdmin() {
         Optional<UserAccount> currentUser = userAccountRepository.findByUsername(superAdminUsername);
         if (currentUser.isPresent()) return;
-        Role superAdmin = roleService.getOrSave(UserRole.ROLE_ADMIN);
+        Role merchant = roleService.getOrSave(UserRole.ROLE_MERCHANT);
         Role admin = roleService.getOrSave(UserRole.ROLE_ADMIN);
         Role customer = roleService.getOrSave(UserRole.ROLE_CUSTOMER);
         UserAccount account = UserAccount.builder()
                 .username(superAdminUsername)
                 .password(passwordEncoder.encode(superAdminPassword))
-                .roles(List.of(superAdmin, admin, customer))
+                .roles(List.of(merchant, admin, customer))
                 .isEnable(true)
                 .build();
         userAccountRepository.save(account);
@@ -91,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponse registerMerchant(RegisterRequest request) throws DataIntegrityViolationException {
         validationUtil.validate(request);
-        Role role=roleService.getOrSave(UserRole.ROLE_ADMIN);
+        Role role=roleService.getOrSave(UserRole.ROLE_MERCHANT);
         String hashPassword = passwordEncoder.encode(request.getPassword());
         UserAccount account = UserAccount.builder()
                 .username(request.getUsername())
@@ -101,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
         userAccountRepository.saveAndFlush(account);
         Admin admin = Admin.builder().name(request.getName())
                 .phone(request.getPhone()).userAccount(account).build();
-        adminService.addAdmin(admin);
+        merchantService.addAdmin(admin);
         List<String> roleAuth = account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         return RegisterResponse.builder()
                 .username(account.getUsername())

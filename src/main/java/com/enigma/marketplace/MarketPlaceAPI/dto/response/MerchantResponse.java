@@ -1,2 +1,16 @@
-package com.enigma.marketplace.MarketPlaceAPI.dto.response;public class MerchantResponse {
+package com.enigma.marketplace.MarketPlaceAPI.dto.response;
+
+import lombok.*;
+
+import java.util.List;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class MerchantResponse {
+    private String id;
+    private String name;
+    private List<ProductResponse> products;
 }

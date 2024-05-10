@@ -20,7 +20,7 @@ public class Product {
     private String name;
     @Column(name = "price")
     private Long price;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "merchant_id", referencedColumnName = "id")
     @JsonBackReference
     private Merchant merchant;

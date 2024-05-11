@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RewardRequest {
+public class NewRewardRequest {
     @NotBlank(message = "Reward Name is Required")
     private String name;
     @NotNull(message = "Reward Point is Required")

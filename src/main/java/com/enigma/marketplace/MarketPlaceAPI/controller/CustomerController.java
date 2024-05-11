@@ -29,7 +29,7 @@ public class CustomerController {
 
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN') or @authenticatedUser.hasCustomerId(#id)")
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<CustomerResponse>> getCustomerById(@PathVariable String id) {
         CustomerResponse customer = customerService.getCustomerById(id);
         CommonResponse<CustomerResponse> response = CommonResponse.<CustomerResponse>builder()
@@ -41,7 +41,7 @@ public class CustomerController {
 
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<CustomerResponse>>> getAllCustomer(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "5") Integer size,
@@ -82,7 +82,7 @@ public class CustomerController {
 
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN') or @authenticatedUser.hasCustomerId(#id)")
-    @DeleteMapping("/{id}")
+    @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse> disableCustomerById(@PathVariable String id) {
         customerService.disableById(id);
         CommonResponse response = CommonResponse.builder()

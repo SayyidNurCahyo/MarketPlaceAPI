@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -86,6 +88,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findProductById(id, merchantId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
         product.setIsActive(false);
         productRepository.saveAndFlush(product);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Product> getAllProduct(String merchantId) {
+        return productRepository.findAllProduct(merchantId);
     }
 
     private ProductResponse convertToProductResponse(Product product){

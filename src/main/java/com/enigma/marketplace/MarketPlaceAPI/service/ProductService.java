@@ -5,7 +5,10 @@ import com.enigma.marketplace.MarketPlaceAPI.dto.request.SearchRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.request.UpdateProductRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.ProductResponse;
 import com.enigma.marketplace.MarketPlaceAPI.entity.Merchant;
+import com.enigma.marketplace.MarketPlaceAPI.entity.Product;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface ProductService {
     ProductResponse addProduct(Merchant merchant, NewProductRequest request);
@@ -15,4 +18,5 @@ public interface ProductService {
     Page<ProductResponse> getAllProduct(SearchRequest request);
     ProductResponse updateProduct(String merchantId, UpdateProductRequest request);
     void disableProductById(String merchantId, String id);
+    List<Product> getAllProduct(String merchantId);
 }

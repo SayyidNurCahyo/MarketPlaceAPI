@@ -12,4 +12,5 @@ public interface CustomerService {
     Page<CustomerResponse> getAllCustomer(SearchRequest request);
     CustomerResponse updateCustomer(UpdateCustomerRequest customer);
     void disableById(String id);
+    void updatePoint(String customerId, Integer point);
 }

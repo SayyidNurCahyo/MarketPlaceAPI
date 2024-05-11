@@ -19,4 +19,6 @@ public class Reward {
     private String name;
     @Column(name = "reward_point")
     private Integer point;
+    @Column(name = "is_active")
+    private Boolean isActive;
 }

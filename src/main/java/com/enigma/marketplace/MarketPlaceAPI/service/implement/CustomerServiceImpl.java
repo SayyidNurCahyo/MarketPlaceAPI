@@ -75,6 +75,14 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.saveAndFlush(customer);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updatePoint(String customerId, Integer point) {
+        Customer customer = customerRepository.findByIdCustomer(customerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Customer Not Found"));
+        customer.setPoint(point);
+        customerRepository.saveAndFlush(customer);
+    }
+
     private CustomerResponse convertToCustomerResponse(Customer customer){
         return CustomerResponse.builder()
                 .id(customer.getId())

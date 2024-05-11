@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,4 +25,6 @@ public interface ProductRepository extends JpaRepository<Product,String > {
     Optional<Product> findProductById(@Param("id") String id);
     @Query(value = "select * from m_product where id = :id and merchant_id = :merchantId and is_active = true", nativeQuery = true)
     Optional<Product> findProductById(@Param("id") String id, @Param("merchantId") String merchantId);
+    @Query(value = "select * from m_product where merchant_id = :merchantId and is_active = true", nativeQuery = true)
+    List<Product> findAllProduct(@Param("merchantId") String merchantId);
 }

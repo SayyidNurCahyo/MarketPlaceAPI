@@ -1,12 +1,15 @@
 package com.enigma.marketplace.MarketPlaceAPI.service.implement;
 
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.NewProductRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.request.SearchRequest;
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.UpdateProductRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.MerchantResponse;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.ProductResponse;
 import com.enigma.marketplace.MarketPlaceAPI.entity.Merchant;
 import com.enigma.marketplace.MarketPlaceAPI.entity.UserAccount;
 import com.enigma.marketplace.MarketPlaceAPI.repository.MerchantRepository;
 import com.enigma.marketplace.MarketPlaceAPI.service.MerchantService;
+import com.enigma.marketplace.MarketPlaceAPI.service.ProductService;
 import com.enigma.marketplace.MarketPlaceAPI.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MerchantServiceImpl implements MerchantService {
     private final MerchantRepository merchantRepository;
+    private final ValidationUtil validationUtil;
+    private final ProductService productService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -62,16 +67,45 @@ public class MerchantServiceImpl implements MerchantService {
         merchantRepository.saveAndFlush(merchant);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public ProductResponse addProduct(String merchantId, NewProductRequest request) {
+        validationUtil.validate(request);
+        Merchant merchant = merchantRepository.findByIdMerchant(merchantId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Merchant Not Found"));
+        return productService.addProduct(merchant, request);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ProductResponse getProductById(String merchantId, String productId) {
+        return productService.getProductById(merchantId, productId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<ProductResponse> getAllProduct(String merchantId, SearchRequest request) {
+        return productService.getAllProduct(merchantId, request);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public ProductResponse updateProduct(String merchantId, UpdateProductRequest request) {
+        validationUtil.validate(request);
+        return productService.updateProduct(merchantId, request);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void disableProductById(String merchantId, String id) {
+        productService.disableProductById(merchantId, id);
+    }
+
     private MerchantResponse convertToMerchantResponse(Merchant merchant){
-        List<ProductResponse> productResponses = merchant.getProducts().stream().map(product ->
-                ProductResponse.builder().id(product.getId()).name(product.getName())
-                    .price(product.getPrice()).build()).toList();
         return MerchantResponse.builder()
                 .id(merchant.getId())
                 .name(merchant.getName())
                 .phone(merchant.getPhone())
                 .address(merchant.getAddress())
-                .products(productResponses)
                 .username(merchant.getUserAccount().getUsername())
                 .build();
     }

@@ -14,6 +14,5 @@ public class MerchantResponse {
     private String name;
     private String phone;
     private String address;
-    private List<ProductResponse> products;
     private String username;
 }

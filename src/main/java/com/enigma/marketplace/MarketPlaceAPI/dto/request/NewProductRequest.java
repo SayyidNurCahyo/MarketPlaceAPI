@@ -16,4 +16,7 @@ public class NewProductRequest {
     @NotNull(message = "Product Price is Required")
     @Min(value = 1, message = "Product Price must be Greater Than 0")
     private Long price;
+    @NotNull(message = "Product Stock is Required")
+    @Min(value = 1, message = "Product Stock must be Greater Than 0")
+    private Integer stock;
 }

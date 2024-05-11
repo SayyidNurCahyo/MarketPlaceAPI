@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateProductReponse {
+public class UpdateProductRequest {
     @NotBlank(message = "ID Product is Required")
     private String id;
     @NotBlank(message = "Product Name is Required")
@@ -18,4 +18,7 @@ public class UpdateProductReponse {
     @NotNull(message = "Product Price is Required")
     @Min(value = 1, message = "Product Price must be Greater Than 0")
     private Long price;
+    @NotNull(message = "Product Stock is Required")
+    @Min(value = 0, message = "Product Stock must be Greater Than or Equal 0")
+    private Integer stock;
 }

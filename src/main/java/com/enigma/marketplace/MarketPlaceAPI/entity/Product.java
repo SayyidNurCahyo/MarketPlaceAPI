@@ -20,8 +20,12 @@ public class Product {
     private String name;
     @Column(name = "price")
     private Long price;
+    @Column(name = "stock")
+    private Integer stock;
     @ManyToOne
     @JoinColumn(name = "merchant_id", referencedColumnName = "id")
     @JsonBackReference
     private Merchant merchant;
+    @Column(name = "is_active")
+    private Boolean isActive;
 }

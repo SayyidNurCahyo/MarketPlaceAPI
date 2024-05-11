@@ -99,8 +99,8 @@ public class AuthServiceImpl implements AuthService {
                 .phone(request.getPhone()).address(request.getAddress())
                 .userAccount(account).build();
         List<Product> products = request.getProducts().stream().map(product ->
-                Product.builder().name(product.getName()).price(product.getPrice())
-                        .merchant(merchant).build()).toList();
+                Product.builder().name(product.getName()).price(product.getPrice()).isActive(true)
+                        .merchant(merchant).stock(product.getStock()).build()).toList();
         merchant.setProducts(products);
         merchantService.addMerchant(merchant);
         List<String> roleAuth = account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();

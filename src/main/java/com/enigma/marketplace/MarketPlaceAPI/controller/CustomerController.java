@@ -83,9 +83,9 @@ public class CustomerController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN') or @authenticatedUser.hasCustomerId(#id)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse<CustomerResponse>> disableCustomerById(@PathVariable String id) {
+    public ResponseEntity<CommonResponse> disableCustomerById(@PathVariable String id) {
         customerService.disableById(id);
-        CommonResponse<CustomerResponse> response = CommonResponse.<CustomerResponse>builder()
+        CommonResponse response = CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message(ResponseMessage.SUCCESS_DELETE_DATA)
                 .build();

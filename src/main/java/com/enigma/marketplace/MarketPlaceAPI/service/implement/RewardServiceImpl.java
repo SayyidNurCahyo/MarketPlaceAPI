@@ -27,7 +27,7 @@ public class RewardServiceImpl implements RewardService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public RewardResponse addReward(NewRewardRequest request) {
-        Reward reward = Reward.builder().name(request.getName()).point(request.getPoint()).build();
+        Reward reward = Reward.builder().name(request.getName()).point(request.getPoint()).isActive(true).build();
         Reward rewardSaved = rewardRepository.saveAndFlush(reward);
         return convertToRewardResponse(rewardSaved);
     }

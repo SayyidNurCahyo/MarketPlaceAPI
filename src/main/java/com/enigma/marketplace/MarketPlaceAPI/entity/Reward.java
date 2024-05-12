@@ -15,7 +15,7 @@ public class Reward {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
     @Column(name = "reward_point")
     private Integer point;

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -22,9 +23,9 @@ public class RegisterMerchantRequest {
     @NotBlank(message = "Address is Required")
     private String address;
     @NotBlank(message = "Username is Required")
-    @Min(value = 8, message = "Username at Least 8 Character")
+    @Length(min = 8, message = "Username at Least 8 Character")
     private String username;
     @NotBlank(message = "Password is Required")
-    @Min(value = 8, message = "Password at Least 8 Character")
+    @Length(min = 8, message = "Password at Least 8 Character")
     private String password;
 }

@@ -49,7 +49,7 @@ public class RewardController {
     }
 
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasRole('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyRole('ADMIN','CUSTOMER')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<RewardResponse>>> getAllReward(
             @RequestParam(name = "page", defaultValue = "1") Integer page,

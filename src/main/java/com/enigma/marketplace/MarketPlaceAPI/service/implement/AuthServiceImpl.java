@@ -75,6 +75,7 @@ public class AuthServiceImpl implements AuthService {
         Customer customer = Customer.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
+                .point(0)
                 .userAccount(account).build();
         customerService.addCustomer(customer);
         List<String> roleAuth = account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();

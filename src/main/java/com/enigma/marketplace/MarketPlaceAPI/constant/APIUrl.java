@@ -7,4 +7,5 @@ public class APIUrl {
     public static final String PRODUCT = "/api/products";
     public static final String TRANSACTION = "/api/transactions";
     public static final String REWARD = "/api/rewards";
+    public static final String CLAIM_REWARD = "/api/claims";
 }

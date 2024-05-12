@@ -45,6 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .customer(Customer.builder().id(customerResponse.getId())
                         .name(customerResponse.getName())
                         .phone(customerResponse.getPhone())
+                        .point(customerResponse.getPoint())
                         .userAccount((UserAccount) userService.loadUserByUsername(customerResponse.getUsername())).build())
                 .merchant(merchant)
                 .build();

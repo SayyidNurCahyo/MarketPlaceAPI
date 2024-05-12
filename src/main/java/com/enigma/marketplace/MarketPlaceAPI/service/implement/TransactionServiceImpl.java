@@ -2,6 +2,7 @@ package com.enigma.marketplace.MarketPlaceAPI.service.implement;
 
 import com.enigma.marketplace.MarketPlaceAPI.dto.request.NewTransactionRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.request.SearchTransactionRequest;
+import com.enigma.marketplace.MarketPlaceAPI.dto.request.UpdateProductRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.*;
 import com.enigma.marketplace.MarketPlaceAPI.entity.*;
 import com.enigma.marketplace.MarketPlaceAPI.repository.TransactionRepository;
@@ -13,8 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -50,7 +53,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .merchant(merchant)
                 .build();
         List<TransactionDetail> transactionDetail = request.getDetailRequests().stream().map(detail -> {
-            ProductResponse productResponse = productService.getProductById(detail.getProductId(), request.getMerchantId());
+            ProductResponse productResponse = productService.getProductById(request.getMerchantId(), detail.getProductId());
+            if(detail.getQuantity()>productResponse.getStock()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order Quantity Exceed Product Stock");
             return TransactionDetail.builder().transaction(transaction)
                     .product(Product.builder().id(productResponse.getId())
                             .name(productResponse.getName())
@@ -60,8 +64,13 @@ public class TransactionServiceImpl implements TransactionService {
                     .quantity(detail.getQuantity()).build();
         }).toList();
         transaction.setTransactionDetails(transactionDetail);
-        customerService.updatePoint(request.getCustomerId(), customerResponse.getPoint() + 1);
         Transaction trSaved = transactionRepository.saveAndFlush(transaction);
+        customerService.updatePoint(request.getCustomerId(), customerResponse.getPoint() + 1);
+        trSaved.getTransactionDetails().forEach(detail ->
+                productService.updateProduct(request.getMerchantId(), UpdateProductRequest.builder()
+                        .id(detail.getProduct().getId()).name(detail.getProduct().getName())
+                        .price(detail.getProduct().getPrice())
+                        .stock(detail.getProduct().getStock()-detail.getQuantity()).build()));
         return convertToTransactionResponse(trSaved);
     }
 
@@ -77,6 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     @Override
     public Page<TransactionResponse> getTransactionByCustomerId(String id, SearchTransactionRequest request) {
+        customerService.getCustomerById(id);
         if (request.getPage()<1) request.setPage(1);
         if (request.getSize()<1) request.setSize(1);
         Pageable page = PageRequest.of(request.getPage() -1, request.getSize(), Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy()));
@@ -86,6 +96,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     @Override
     public Page<TransactionResponse> getTransactionByMerchantId(String id, SearchTransactionRequest request) {
+        merchantService.getMerchantById(id);
         if (request.getPage()<1) request.setPage(1);
         if (request.getSize()<1) request.setSize(1);
         Pageable page = PageRequest.of(request.getPage() -1, request.getSize(), Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy()));

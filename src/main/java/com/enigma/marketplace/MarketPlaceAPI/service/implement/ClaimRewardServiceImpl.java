@@ -56,6 +56,9 @@ public class ClaimRewardServiceImpl implements ClaimRewardService {
                 .reward(reward).build();
         ClaimReward claimRewardSaved = claimRewardRepository.saveAndFlush(claimReward);
         customerService.updatePoint(request.getCustomerId(), customer.getPoint() - reward.getPoint());
+        Customer customer1 = claimRewardSaved.getCustomer();
+        customer1.setPoint(customer1.getPoint()- reward.getPoint());
+        claimRewardSaved.setCustomer(customer1);
         return convertToClaimResponse(claimRewardSaved);
     }
 
@@ -71,6 +74,7 @@ public class ClaimRewardServiceImpl implements ClaimRewardService {
     @Transactional(readOnly = true)
     @Override
     public Page<ClaimRewardResponse> getClaimByCustomerId(String customerId, SearchTransactionRequest request) {
+        customerService.getCustomerById(customerId);
         if (request.getPage()<1) request.setPage(1);
         if (request.getSize()<1) request.setSize(1);
         Pageable page = PageRequest.of(request.getPage() -1, request.getSize(), Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy()));

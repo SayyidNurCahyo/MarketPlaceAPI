@@ -6,6 +6,7 @@ import com.enigma.marketplace.MarketPlaceAPI.dto.request.UpdateProductRequest;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.MerchantResponse;
 import com.enigma.marketplace.MarketPlaceAPI.dto.response.ProductResponse;
 import com.enigma.marketplace.MarketPlaceAPI.entity.Merchant;
+import com.enigma.marketplace.MarketPlaceAPI.entity.Product;
 import com.enigma.marketplace.MarketPlaceAPI.entity.UserAccount;
 import com.enigma.marketplace.MarketPlaceAPI.repository.MerchantRepository;
 import com.enigma.marketplace.MarketPlaceAPI.service.MerchantService;
@@ -60,10 +61,13 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void disableById(String id) {
-        Merchant merchant = merchantRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Merchant Not Found"));
+        Merchant merchant = merchantRepository.findByIdMerchant(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Merchant Not Found"));
         UserAccount account = merchant.getUserAccount();
         account.setIsEnable(false);
         merchant.setUserAccount(account);
+        for (Product product: merchant.getProducts()){
+            productService.disableProductById(merchant.getId(), product.getId());
+        }
         merchantRepository.saveAndFlush(merchant);
     }
 
@@ -78,12 +82,14 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(readOnly = true)
     @Override
     public ProductResponse getProductById(String merchantId, String productId) {
+        merchantRepository.findByIdMerchant(merchantId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Merchant Not Found"));
         return productService.getProductById(merchantId, productId);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<ProductResponse> getAllProduct(String merchantId, SearchRequest request) {
+        merchantRepository.findByIdMerchant(merchantId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Merchant Not Found"));
         return productService.getAllProduct(merchantId, request);
     }
 
@@ -91,12 +97,14 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public ProductResponse updateProduct(String merchantId, UpdateProductRequest request) {
         validationUtil.validate(request);
+        merchantRepository.findByIdMerchant(merchantId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Merchant Not Found"));
         return productService.updateProduct(merchantId, request);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void disableProductById(String merchantId, String id) {
+        merchantRepository.findByIdMerchant(merchantId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Merchant Not Found"));
         productService.disableProductById(merchantId, id);
     }
 

@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse addProduct(Merchant merchant, NewProductRequest request) {
         validationUtil.validate(request);
         Product product = Product.builder().name(request.getName()).price(request.getPrice())
-                .stock(request.getStock()).merchant(merchant).build();
+                .stock(request.getStock()).merchant(merchant).isActive(true).build();
         Product productSaved = productRepository.saveAndFlush(product);
         return convertToProductResponse(productSaved);
     }

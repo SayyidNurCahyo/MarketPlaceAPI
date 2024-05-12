@@ -44,8 +44,8 @@ public class TransactionController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<TransactionResponse>>> getAllTransaction(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
-            @RequestParam(name = "size", defaultValue = "5") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(name = "size", defaultValue = "10") Integer size,
+            @RequestParam(name = "sortBy", defaultValue = "date") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction
     ){
         SearchTransactionRequest request = SearchTransactionRequest.builder()
@@ -69,8 +69,8 @@ public class TransactionController {
     @GetMapping(path = "/customers/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<TransactionResponse>>> getAllTransactionByCustomerId(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
-            @RequestParam(name = "size", defaultValue = "5") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(name = "size", defaultValue = "10") Integer size,
+            @RequestParam(name = "sortBy", defaultValue = "date") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction,
             @PathVariable String id
     ){
@@ -95,8 +95,8 @@ public class TransactionController {
     @GetMapping(path = "/merchants/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<TransactionResponse>>> getAllTransactionByMerchantId(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
-            @RequestParam(name = "size", defaultValue = "5") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(name = "size", defaultValue = "10") Integer size,
+            @RequestParam(name = "sortBy", defaultValue = "date") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction,
             @PathVariable String id
     ){
